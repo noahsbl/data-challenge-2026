@@ -1,0 +1,14 @@
+torch
+torchvision
+segmentation-models-pytorch
+transformers
+tensorboard
+PyYAML
+scikit-learn
+streamlit
+pandas
+numpy
+tifffile
+Pillow
+opencv-python
+tqdm

@@ -1,0 +1,78 @@
+task: segmentation
+run_root: runs
+run_name: segformer_b0_original_model_labeled_60_20_20_iou_optimized
+
+data:
+  sources:
+    - name: labeled
+      root: ../data/labeled
+      images: imgs
+      masks: msks
+      split_csv: split_mapping_60_20_20.csv
+      enabled: true
+      use_for:
+        train: true
+        val: true
+        test: true
+
+    - name: model_labeled
+      root: ../data/model_labeled
+      images: imgs
+      masks: msks
+      split_csv: image_info.csv
+      enabled: true
+      use_for:
+        train: true
+        val: false
+        test: false
+
+model:
+  type: segformer
+  pretrained_model: nvidia/mit-b0
+  pretrained: true
+  in_channels: 3
+  classes: 1
+
+training:
+  epochs: 60
+  batch_size: 12
+  image_size: 512
+  workers: 4
+  seed: 42
+  device: cuda:0
+  augment: true
+  sampler: balanced
+
+optimizer:
+  name: adamw
+  learning_rate: 0.0001
+  weight_decay: 0.01
+
+loss:
+  bce_weight: 1.0
+  dice_weight: 2.0
+
+validation:
+  selection_metric: iou
+  pipeline_every: 1
+  threshold_search:
+    values:
+      - 0.985
+      - 0.990
+      - 0.992
+      - 0.994
+      - 0.996
+      - 0.997
+      - 0.998
+      - 0.999
+
+inference:
+  threshold: auto
+  image_size: 512
+  min_area: 10
+  device: null
+
+evaluation:
+  test_after_training: true
+  export_errors: true
+  report_per_source: true
